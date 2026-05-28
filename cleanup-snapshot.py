@@ -11,7 +11,7 @@ volumes = ec2_client.describe_volumes(
         }
     ]
 )
-
+    
 for volume in volumes['Volumes']:
     snapshots = ec2_client.describe_snapshots(
         OwnerIds=['self'],
