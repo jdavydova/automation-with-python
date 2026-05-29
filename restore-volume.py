@@ -16,6 +16,10 @@ volumes = ec2_client.describe_volumes(
     ]
 )
 
+if len(volumes["Volumes"]) == 0:
+    print("No volume found with tag Name=prod")
+    exit()
+
 instance_volume = volumes["Volumes"][0]
 
 snapshots = ec2_client.describe_snapshots(

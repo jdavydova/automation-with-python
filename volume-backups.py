@@ -25,6 +25,10 @@ def create_volume_snapshots():
         print(new_snapshot)
 
 
+# for testing
+#schedule.every(5).seconds.do(create_volume_snapshots)
+
+# for real life
 schedule.every().day.do(create_volume_snapshots)
 
 while True:
