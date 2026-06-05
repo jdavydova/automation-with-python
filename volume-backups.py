@@ -1,13 +1,11 @@
 import boto3
 import schedule
 
-
 print(schedule)
 print(schedule.__file__)
 print(dir(schedule))
 
 ec2_client = boto3.client('ec2', region_name="eu-central-1")
-
 
 def create_volume_snapshots():
     volumes = ec2_client.describe_volumes(
