@@ -4,12 +4,13 @@ import requests
 import smtplib
 import paramiko
 import linode_api4
-
+import schedule
 
 EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
 EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 LINODE_TOKEN = os.environ.get('LINODE_TOKEN')
 LINODE_ID = os.environ.get('LINODE_ID')
+IP_ADDRESS = os.environ.get('IP_ADDRESS')
 
 if not EMAIL_ADDRESS or not EMAIL_PASSWORD:
     raise ValueError("Email credentials not configured")
@@ -31,7 +32,7 @@ def restart_container():
     print('Restarting Application ... ')
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname='IP-ADDRESS-SERVER', username='root', key_filename='.ssh/id_rsa')
+    ssh.connect(hostname=IP_ADDRESS, username='root', key_filename='.ssh/id_rsa')
     stdin, stdout, stderr = ssh.exec_command('docker ps')
     print(stdin)
     print(stdout)
@@ -52,22 +53,26 @@ def restart_server_and_container():
             break
 
 
-try:
-    response = requests.get('http://IP-ADDRESS-PORT.ip.linodeseconter.com:8080')
-    print(response)
-    if response.status_code == 200:
-        print("Application is running successfully!", response.status_code)
-    else:
-        print("Application is Down.Fix it!", response.status_code)
-        # send email
-        msg = f"Application is returned \n{response.status_code}"
+def monitor_application():
+    try:
+        response = requests.get(f"http://{IP_ADDRESS}.ip.linodeseconter.com:8080")
+        print(response)
+        if response.status_code == 200:
+            print("Application is running successfully!", response.status_code)
+        else:
+            print("Application is Down.Fix it!", response.status_code)
+            # send email
+            msg = f"Application is returned \n{response.status_code}"
+            send_notification(msg)
+            restart_container()
+    except Exception as ex:
+        print(f'Connection Error happened! {ex}')
+        msg = f"Application not accessible {ex}"
         send_notification(msg)
-        restart_container()
+        restart_server_and_container()
 
+schedule.every(5).minutes.do(monitor_application)
 
-except Exception as ex:
-    print(f'Connection Error happened! {ex}')
-    msg = f"Application not accessible {ex}"
-    send_notification(msg)
-    restart_server_and_container()
-
+while True:
+    schedule.run_pending()
+    
