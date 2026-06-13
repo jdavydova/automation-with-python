@@ -8,7 +8,7 @@ pipeline {
         EC2_USER = 'ec2-user'
 
         // will be set to the location of the SSH key file that is temporarily created
-        SSH_KEY_FILE = credentials('ssh-creds')
+        SSH_KEY_FILE = credentials('ec2-server-key')
 
         ECR_REGISTRY = '788577008603.dkr.ecr.eu-north-1.amazonaws.com' // SET VALUE
         DOCKER_USER = 'AWS'
