@@ -23,5 +23,8 @@ print(stdout.readlines())
 stdin, stdout, stderr = ssh.exec_command(f"docker run -p {host_port}:{container_port} -d {docker_image}")
 print(stdout.readlines())
 
+print(stdout.read().decode())
+print(stderr.read().decode())
+
 ssh.close()
 
