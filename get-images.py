@@ -9,8 +9,10 @@ ecr_client = boto3.client('ecr')
 images = ecr_client.describe_images(repositoryName=repo_name)
 
 image_tags = []
-for image in images['imageDetails']:
-    image_tags.append(image['imageTags'][0])
+for image in images["imageDetails"]:
+    if "imageTags" in image:
+        for tag in image["imageTags"]:
+            image_tags.append(tag)
 
 for tag in image_tags:
     print(tag)
